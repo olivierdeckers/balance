@@ -43,6 +43,7 @@ olivierdeckers.balance = (function() {
 		}
 	}
 	
+	// Create EeaselJS Shapes
 	function easelSetup() {
 		canvas = document.getElementById('canvas');
 		stage = new Stage(canvas);
@@ -86,6 +87,7 @@ olivierdeckers.balance = (function() {
 		stage.addChild(highscoreTxt);
 	}
 	
+	// Create Box2D bodies and joint
 	function b2Setup() {
 		world = new b2World(new b2Vec2(0,1), false);
 		
@@ -118,9 +120,9 @@ olivierdeckers.balance = (function() {
 		jointDef.localAnchorB.Set(0, -45 / SCALE);
 	    joint = world.CreateJoint(jointDef);
 	}
-
-	var tick = function() {
-		var twoPi = 2*Math.PI;
+	
+	var twoPi = 2*Math.PI;
+	function updateScore() {
 		var angle = ((joint.GetJointAngle() % (twoPi)) + twoPi) % (twoPi);
 		angle = angle / Math.PI * 180;
 		
@@ -134,16 +136,21 @@ olivierdeckers.balance = (function() {
 			score = 0;
 		}
 		scoreTxt.text = "Score: " + Math.round(score / 1000);
+	}
+	
+	var tick = function() {
+		updateScore();
 		
+		// calculate new position of pendulum using Box2D
 		world.Step(TIMESTEP, 10, 10);
 		
+		// update pendulum location and rotation
 		pendulum.x = pendulumBody.GetPosition().x * SCALE;
 		pendulum.y = pendulumBody.GetPosition().y * SCALE;
 		pendulum.rotation = pendulumBody.GetAngle() / Math.PI * 180;
 		
 		stage.update();
 		world.ClearForces();
-		world.DrawDebugData();
 		
 		timeOfLastFrame = getTime();
 	}
