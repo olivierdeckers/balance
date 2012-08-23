@@ -1,7 +1,7 @@
 var canvas;
 var stage;
 
-var motor;
+var motor, stang;
 var speed = 0;
 var accel = 0;
 
@@ -14,31 +14,40 @@ function init() {
 	stage = new Stage(canvas);
 	
 	var track = new Shape();
-	g = track.graphics;
+	var g = track.graphics;
 	g.beginFill("#000000");
 	g.drawRect(0, 0, canvas.width - 20, 4);
-	track.x = canvas.width / 2;
-	track.y = canvas.height / 2;
 	track.regX = canvas.width / 2 - 10;
 	track.regY = 2;
+	track.x = canvas.width / 2;
+	track.y = canvas.height / 2;
 	stage.addChild(track);
 	
 	motor = new Shape();
 	var g = motor.graphics;
 	g.beginFill('#000000');
-	g.drawRect(0, 0, 20, 20);
+	g.drawCircle(0, 0, 10);
 	motor.x = canvas.width / 2;
 	motor.y = canvas.height / 2;
-	motor.regY = 10;
-	motor.regX = 10;
 	stage.addChild(motor);
 	
-	Ticker.setInterval(20);
+	stang = new Shape();
+	var g = stang.graphics;
+	g.beginFill("#FF0000");
+	g.drawRect(0, 0, 100, 4);
+	stang.regX = 5;
+	stang.regY = 2;
+	stang.rotation = 90;
+	stang.x = canvas.width / 2;
+	stang.y = canvas.height / 2;
+	stage.addChild(stang);
+	
+	Ticker.setFPS(60);
 	Ticker.addListener(window);
 }
 
 function tick() {
-	if (speed < 10) {
+	if (Math.abs(speed) < 10) {
 		speed += accel;
 	}
 	if (motor.x + speed > 12 && motor.x + speed < canvas.width - 12) {
@@ -47,7 +56,6 @@ function tick() {
 	
 	stage.update();
 }
-
 
 function keyUp() {
 	if (speed < 0 && event.keyCode === 37) {
