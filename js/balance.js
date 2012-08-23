@@ -1,8 +1,8 @@
 var olivierdeckers = {};
 olivierdeckers.balance = (function() {
 	// easeljs
-	var canvas;
-	var stage;
+	var canvas, stage;
+	var motor, pendulum;
 	
 	// Box2d vars
 	var b2Vec2 = Box2D.Common.Math.b2Vec2;
@@ -19,18 +19,19 @@ olivierdeckers.balance = (function() {
 	var SCALE = 30;
 	var TIMESTEP = 1.0/20;
 	var world;
-	var motorBody;
+	var motorBody, pendulumBody;
 	var joint;
 	
-	var motor, pendulum;
+	var scoreTxt, highscoreTxt;
+	var score = 0, highscore = 0;
+	var timeOfLastFrame = new Date().getTime();
+	
+	function getTime() {
+		return new Date().getTime();
+	}
 
 	var init = function() {
-		canvas = document.getElementById('canvas');
-	
-		stage = new Stage(canvas);
-		setup();
-		
-		world = new b2World(new b2Vec2(0,1), false);
+		easelSetup();
 		b2Setup();
 		
 		Ticker.setFPS(60);
@@ -38,14 +39,14 @@ olivierdeckers.balance = (function() {
 		
 		document.onmousemove = function(event) {
 			motor.x = event.clientX - canvas.offsetLeft;
-			//motor.y = event.clientY - canvas.offsetTop;
 			motorBody.SetPosition(new b2Vec2(motor.x / SCALE, motor.y / SCALE));
 		}
-	
-		debugSetup();
 	}
 	
-	function setup() {
+	function easelSetup() {
+		canvas = document.getElementById('canvas');
+		stage = new Stage(canvas);
+		
 		var track = new Shape();
 		var g = track.graphics;
 		g.beginFill("#000000");
@@ -73,9 +74,21 @@ olivierdeckers.balance = (function() {
 		pendulum.x = canvas.width / 2;
 		pendulum.y = canvas.height / 2 + 45;
 		stage.addChild(pendulum);
+		
+		scoreTxt = new Text("Score: 0");
+		scoreTxt.x = 20;
+		scoreTxt.y = 380;
+		stage.addChild(scoreTxt);
+		
+		highscoreTxt = new Text("Highscore: 0");
+		highscoreTxt.x = 870;
+		highscoreTxt.y = 380;
+		stage.addChild(highscoreTxt);
 	}
 	
 	function b2Setup() {
+		world = new b2World(new b2Vec2(0,1), false);
+		
 		var motorFixture = new b2FixtureDef;
 		motorFixture.density = 1;
 		motorFixture.restitution = 1;
@@ -96,7 +109,7 @@ olivierdeckers.balance = (function() {
 		pendulumBodyDef.type = b2Body.b2_dynamicBody;
 		pendulumBodyDef.position.x = pendulum.x / SCALE;
 		pendulumBodyDef.position.y = pendulum.y / SCALE;
-		var pendulumBody = world.CreateBody(pendulumBodyDef);
+		pendulumBody = world.CreateBody(pendulumBodyDef);
 		pendulumBody.CreateFixture(pendulumFixture);
 		
 		var jointDef = new b2RevoluteJointDef();
@@ -107,6 +120,7 @@ olivierdeckers.balance = (function() {
 	}
 	
 	function debugSetup() {
+		return;
 		var debugDraw = new Box2D.Dynamics.b2DebugDraw;
 		debugDraw.SetSprite(document.getElementById("debugcanvas").getContext("2d"));
 		debugDraw.SetDrawScale(SCALE);
@@ -117,16 +131,36 @@ olivierdeckers.balance = (function() {
 	}
 
 	var tick = function() {
-		//console.log("angle: "+joint.GetJointAngle() / Math.PI * 180 % 180);
+		var twoPi = 2*Math.PI;
+		var angle = ((joint.GetJointAngle() % (twoPi)) + twoPi) % (twoPi);
+		angle = angle / Math.PI * 180;
+		
+		if (angle > 120 && angle < 240) {
+			var now = getTime();
+			score += now - timeOfLastFrame;
+			highscore = Math.max(highscore, score);
+			
+			highscoreTxt.text = "Highscore: " + Math.round(highscore / 1000);
+		} else {
+			score = 0;
+		}
+		scoreTxt.text = "Score: " + Math.round(score / 1000);
+		
+		world.Step(TIMESTEP, 10, 10);
+		
+		pendulum.x = pendulumBody.GetPosition().x * SCALE;
+		pendulum.y = pendulumBody.GetPosition().y * SCALE;
+		pendulum.rotation = pendulumBody.GetAngle() / Math.PI * 180;
 		
 		stage.update();
-		world.Step(TIMESTEP, 10, 10);
 		world.ClearForces();
 		world.DrawDebugData();
+		
+		timeOfLastFrame = getTime();
 	}
 	
 	return {
 		tick: tick,
 		init: init
 	}
-})();
+}());
