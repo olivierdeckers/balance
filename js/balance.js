@@ -19,6 +19,8 @@ olivierdeckers.balance = (function() {
 	var SCALE = 30;
 	var TIMESTEP = 1.0/20;
 	var world;
+	var motorBody;
+	var joint;
 	
 	var motor, pendulum;
 
@@ -28,7 +30,7 @@ olivierdeckers.balance = (function() {
 		stage = new Stage(canvas);
 		setup();
 		
-		world = new b2World(new b2Vec2(0,10), true);
+		world = new b2World(new b2Vec2(0,1), false);
 		b2Setup();
 		
 		Ticker.setFPS(60);
@@ -36,6 +38,8 @@ olivierdeckers.balance = (function() {
 		
 		document.onmousemove = function(event) {
 			motor.x = event.clientX - canvas.offsetLeft;
+			//motor.y = event.clientY - canvas.offsetTop;
+			motorBody.SetPosition(new b2Vec2(motor.x / SCALE, motor.y / SCALE));
 		}
 	
 		debugSetup();
@@ -77,10 +81,10 @@ olivierdeckers.balance = (function() {
 		motorFixture.restitution = 1;
 		motorFixture.shape = new b2CircleShape(10 / SCALE);
 		var motorBodyDef = new b2BodyDef;
-		motorBodyDef.type = b2Body.b2_staticBody;
+		motorBodyDef.type = b2Body.b2_kinematicBody;
 		motorBodyDef.position.x = motor.x / SCALE;
 		motorBodyDef.position.y = motor.y / SCALE;
-		var motorBody = world.CreateBody(motorBodyDef);
+		motorBody = world.CreateBody(motorBodyDef);
 		motorBody.CreateFixture(motorFixture);
 		
 		var pendulumFixture = new b2FixtureDef;
@@ -95,9 +99,11 @@ olivierdeckers.balance = (function() {
 		var pendulumBody = world.CreateBody(pendulumBodyDef);
 		pendulumBody.CreateFixture(pendulumFixture);
 		
-		var joint = new b2RevoluteJointDef();
-	    joint.Initialize(motorBody, pendulumBody, motorBody.GetWorldCenter());
-	    world.CreateJoint(joint);
+		var jointDef = new b2RevoluteJointDef();
+	    jointDef.Initialize(motorBody, pendulumBody, motorBody.GetWorldCenter());
+		jointDef.localAnchorA.Set(0, 0);
+		jointDef.localAnchorB.Set(0, -45 / SCALE);
+	    joint = world.CreateJoint(jointDef);
 	}
 	
 	function debugSetup() {
@@ -111,13 +117,8 @@ olivierdeckers.balance = (function() {
 	}
 
 	var tick = function() {
-		if (motor.x < 12) {
-			motor.x = 12;
-		}
-		else if (motor.x > canvas.width - 12) {
-			motor.x = canvas.width - 12;
-		}
-	
+		//console.log("angle: "+joint.GetJointAngle() / Math.PI * 180 % 180);
+		
 		stage.update();
 		world.Step(TIMESTEP, 10, 10);
 		world.ClearForces();
