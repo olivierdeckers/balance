@@ -3,11 +3,6 @@ var canvas;
 var stage;
 
 var motor, pendulum;
-var speed = 0;
-var accel = 0;
-
-document.onkeyup = keyUp;
-document.onkeydown = keyDown;
 
 function init() {
 	canvas = document.getElementById('canvas');
@@ -48,35 +43,16 @@ function init() {
 }
 
 function tick() {
-	if (Math.abs(speed) < 10) {
-		speed += accel;
+	if (motor.x < 12) {
+		motor.x = 12;
 	}
-	if (motor.x + speed > 12 && motor.x + speed < canvas.width - 12) {
-		motor.x += speed;
+	else if (motor.x > canvas.width - 12) {
+		motor.x = canvas.width - 12;
 	}
 	
 	stage.update();
 }
 
-function keyUp() {
-	if (speed < 0 && event.keyCode === 37) {
-		speed = 0;
-		accel = 0;
-	}
-	else if (speed > 0 && event.keyCode === 39) {
-		speed = 0;
-		accel = 0;
-	}
-}
-
-var maxAccel = 0.5;
-function keyDown() {
-	switch(event.keyCode) {
-		case 37: //left
-			accel = -maxAccel;
-		break;
-		case 39: //right
-			accel = maxAccel;
-		break;
-	}
+document.onmousemove = function(event) {
+	motor.x = event.clientX - canvas.offsetLeft;
 }
