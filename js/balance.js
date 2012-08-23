@@ -1,7 +1,8 @@
+// easeljs
 var canvas;
 var stage;
 
-var motor, stang;
+var motor, pendulum;
 var speed = 0;
 var accel = 0;
 
@@ -31,16 +32,16 @@ function init() {
 	motor.y = canvas.height / 2;
 	stage.addChild(motor);
 	
-	stang = new Shape();
-	var g = stang.graphics;
+	pendulum = new Shape();
+	var g = pendulum.graphics;
 	g.beginFill("#FF0000");
 	g.drawRect(0, 0, 100, 4);
-	stang.regX = 5;
-	stang.regY = 2;
-	stang.rotation = 90;
-	stang.x = canvas.width / 2;
-	stang.y = canvas.height / 2;
-	stage.addChild(stang);
+	pendulum.regX = 5;
+	pendulum.regY = 2;
+	pendulum.rotation = 90;
+	pendulum.x = canvas.width / 2;
+	pendulum.y = canvas.height / 2;
+	stage.addChild(pendulum);
 	
 	Ticker.setFPS(60);
 	Ticker.addListener(window);
