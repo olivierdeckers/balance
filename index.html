@@ -5,22 +5,15 @@
 	<script type="text/javascript" src="lib/Box2dWeb-2.1.a.3.min.js"></script>
 	<script type="text/javascript" src="js/balance.js"></script>
 	<style type="text/css">
-	#debugcanvas {
-		position:absolute;
-		top:0px;
-		left:0px;
-		z-index:2;
-	}
 	#canvas {
-		position:absolute;
-		top:0px;
-		left:0px;
-		z-index:1;
+		display:block;
+		margin-left:auto;
+		margin-right:auto;
+		margin-top:150px;
 	}
 	</style>
 </head>
 <body onload="olivierdeckers.balance.init();">
 	<canvas id="canvas" width="960" height="400"></canvas>
-	<canvas id="debugcanvas" width="960" height="400"></canvas>
 </body>
 </html>	

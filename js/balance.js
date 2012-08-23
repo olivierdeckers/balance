@@ -81,7 +81,7 @@ olivierdeckers.balance = (function() {
 		stage.addChild(scoreTxt);
 		
 		highscoreTxt = new Text("Highscore: 0");
-		highscoreTxt.x = 870;
+		highscoreTxt.x = 850;
 		highscoreTxt.y = 380;
 		stage.addChild(highscoreTxt);
 	}
@@ -117,17 +117,6 @@ olivierdeckers.balance = (function() {
 		jointDef.localAnchorA.Set(0, 0);
 		jointDef.localAnchorB.Set(0, -45 / SCALE);
 	    joint = world.CreateJoint(jointDef);
-	}
-	
-	function debugSetup() {
-		return;
-		var debugDraw = new Box2D.Dynamics.b2DebugDraw;
-		debugDraw.SetSprite(document.getElementById("debugcanvas").getContext("2d"));
-		debugDraw.SetDrawScale(SCALE);
-		debugDraw.SetFillAlpha(0.7);
-		debugDraw.SetLineThickness(1.0);
-		debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit);
-		world.SetDebugDraw(debugDraw);
 	}
 
 	var tick = function() {
