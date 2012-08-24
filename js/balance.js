@@ -37,10 +37,24 @@ olivierdeckers.balance = (function() {
 		Ticker.setFPS(60);
 		Ticker.addListener(olivierdeckers.balance);
 		
-		document.onmousemove = function(event) {
-			motor.x = event.clientX - canvas.offsetLeft;
-			motorBody.SetPosition(new b2Vec2(motor.x / SCALE, motor.y / SCALE));
-		}
+		document.onmousemove = move;
+		document.ontouchmove = touchMove;
+		document.ontouchstart = touchMove;
+		
+		document.body.addEventListener('touchmove', function(event) {
+		  event.preventDefault();
+		}, false); 
+	}
+	
+	function move(event) {
+		motor.x = event.clientX - canvas.offsetLeft;
+		motorBody.SetPosition(new b2Vec2(motor.x / SCALE, motor.y / SCALE));
+	}
+	
+	function touchMove(event) {
+		var touch = event.touches[0];
+		motor.x = touch.pageX - canvas.offsetLeft;
+		motorBody.SetPosition(new b2Vec2(motor.x / SCALE, motor.y / SCALE));
 	}
 	
 	// Create EeaselJS Shapes
